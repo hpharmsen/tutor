@@ -1,12 +1,9 @@
 """ The main program for the language tutor """
 import sys
 
-import settings
-from commands import CommandHandler
-from display import SYSTEM_COLOR, color_print, DEBUG_COLOR2, DEBUG_COLOR1
-from gpt import GPT
-from repl import Repl
-from settings import get_settings, random_word, WORDS_PER_LEVEL
+from gpteasy import GPT, Repl, CommandHandler
+import gpteasy.display as gpt_display
+import gpteasy.settings as gpt_setings
 from synthesize import say
 
 STATUS_NEXT_QUESTION = 1
@@ -16,7 +13,7 @@ STATUS_ANSWER = 2
 class Tutor(GPT):
     def __init__(self):
         super().__init__()
-        self.system = settings.system_message
+        self.system = gpt_setings.system_message
         self.hard_concepts = []
         self.message_memory = 4
         self.last_question = ''
@@ -34,15 +31,14 @@ class Tutor(GPT):
                 Generate a new sentence that includes one or more of the concepts I got wrong"""
             else:
                 prompt = "Generate a new sentence"
-            prompt += f"\ninclude the word {random_word()}"
-            if get_settings()['debug'] == '1':
-                color_print(prompt, color=DEBUG_COLOR2)
+            prompt += f"\ninclude the word {gpt_setings.random_word()}"
+            if gpt_setings.get_settings()['debug'] == '1':
+                gpt_display.color_print(prompt, color=gpt_display.DEBUG_COLOR2)
         else:
             # Ask the user for a prompt
-            s = get_settings()
             prompt = ''
             while not prompt:
-                prompt = input(f"{s['language']}: ")
+                prompt = input(f"{gpt_setings.get_settings()['language']}: ")
         return prompt
 
     def chat(self, prompt, add_to_messages=True):
@@ -51,9 +47,8 @@ class Tutor(GPT):
 
         message = super().chat(prompt, add_to_messages=add_to_messages)
 
-        s = get_settings()
-        if get_settings()['debug'] == '1':
-            color_print(message.text, color=DEBUG_COLOR1)
+        if gpt_setings.get_settings()['debug'] == '1':
+            gpt_display.color_print(message.text, color=gpt_display.DEBUG_COLOR1)
 
         reply = message.content()
         match reply['type']:
@@ -73,33 +68,36 @@ class Tutor(GPT):
 
     def after_response(self, message):
         reply = message.content()
-        if reply['type'] == 'analysis' and get_settings().get('play_audio') == '1':
+        if reply['type'] == 'analysis' and gpt_setings.get_settings().get('play_audio') == '1':
             sentence = self.last_answer if reply['verdict'] == 'right' else reply['right_answer']
-            say(sentence, language=get_settings()['language'])
+            say(sentence, language=gpt_setings.get_settings()['language'])
+
 
 def handle_level(level: str):
     level = level.upper()
-    accepted_levels = WORDS_PER_LEVEL.keys()
+    accepted_levels = gpt_setings.WORDS_PER_LEVEL.keys()
     if level not in accepted_levels:
-        color_print(f"Error: level must be one of {', '.join(accepted_levels)}", color=SYSTEM_COLOR)
+        gpt_display.color_print(f"Error: level must be one of {', '.join(accepted_levels)}",
+                                color=gpt_display.SYSTEM_COLOR)
     else:
-        s = get_settings()
-        s['level'] = level
-        color_print(f'language level set to {level}', color=SYSTEM_COLOR)
+        gpt_setings.get_settings()['level'] = level
+        gpt_display.color_print(f'language level set to {level}', color=gpt_display.SYSTEM_COLOR)
     return True
+
 
 def handle_debug(debug: str):
-    s = get_settings()
-    s['debug'] = debug
-    color_print(f'debug set to {debug}', color=SYSTEM_COLOR)
+    gpt_setings.get_settings()['debug'] = debug
+    gpt_display.color_print(f'debug set to {debug}', color=gpt_display.SYSTEM_COLOR)
     return True
 
+
 if __name__ == "__main__":
-    s = get_settings()
-    color_print(f"Hello, I am your {s['language']} tutor on {s['level']} level. " +
-                f"I will help you learn {s['language']}.\n" +
-                f"I will give you sentences in English and you will have to translate them into {s['language']}.\n" +
-                "Here's your first sentence:\n", color=SYSTEM_COLOR)
+    s = gpt_setings.get_settings()
+    gpt_display.color_print(f"Hello, I am your {s['language']} tutor on {s['level']} level. " +
+                            f"I will help you learn {s['language']}.\n" +
+                            f"I will give you sentences in English ' +"
+                            f"and you will have to translate them into {s['language']}.\n" +
+                            f"Here's your first sentence:\n", color=gpt_display.SYSTEM_COLOR)
     gpt = Tutor()
     gpt.model = s['model']
 

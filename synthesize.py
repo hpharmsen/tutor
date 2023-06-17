@@ -2,6 +2,7 @@ import os
 
 import gtts
 from playsound import playsound
+#from playaudio import playaudio as playsound
 
 LANGUAGE_CODES = {
     "English": "en",

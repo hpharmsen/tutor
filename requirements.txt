@@ -1,2 +1,5 @@
-playsound
 gpteasy
+gtts
+playsound
+python-dateutil
+PyObjC
