@@ -18,10 +18,10 @@ dependencies = [
     "openai",
     "tenacity",
     "gpteasy",
-    "gtts",
-    "playsound",
-    "python-dateutil",
-    "PyObjC"
+    #"gtts",
+    #"playsound",
+    #"python-dateutil",
+    #"PyObjC"
 ]
 requires-python = ">=3.10"
 

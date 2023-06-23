@@ -1,5 +1,5 @@
 gpteasy
-gtts
-playsound
+#gtts
+#playsound
 python-dateutil
-PyObjC
+#PyObjC
