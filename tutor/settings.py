@@ -2,6 +2,7 @@
 import configparser
 import json
 import random
+from pathlib import Path
 
 WORDS_PER_LEVEL = {'A1': 500, 'A2': 1000, 'B1': 2000, 'B2': 4000, 'C1': 8000, 'C2': 16000}
 
@@ -10,7 +11,7 @@ def get_settings():
     global _settings
     if _settings is None:
         config_object = configparser.ConfigParser()
-        with open("settings.ini", "r") as f:
+        with open(Path(__file__).resolve().parent / "settings.ini", "r") as f:
             config_object.read_file(f)
         _settings = {t[0]: t[1] for t in config_object.items('general')}
         language = _settings['language']
@@ -95,6 +96,6 @@ def random_word():
         s = get_settings()
         # How many words we include in the list depends on the level of the user
         max_words = WORDS_PER_LEVEL[s['level']]
-        with open("words.txt", 'r') as f:
+        with open(Path(__file__).resolve().parent / "words.txt", 'r') as f:
             _words = f.read().splitlines()[:max_words]
     return random.choice(_words)
