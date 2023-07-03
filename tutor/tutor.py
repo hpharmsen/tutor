@@ -3,7 +3,7 @@ import sys
 
 from gpteasy import GPT, Repl, CommandHandler
 import gpteasy.display as gpt_display
-import settings
+import .settings
 # from synthesize import say
 
 STATUS_NEXT_QUESTION = 1
