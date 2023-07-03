@@ -3,12 +3,14 @@ import sys
 
 from gpteasy import GPT, Repl, CommandHandler
 import gpteasy.display as gpt_display
-import tutor.settings
-from synthesize import say
+import settings
+# from synthesize import say
 
 STATUS_NEXT_QUESTION = 1
 STATUS_ANSWER = 2
 
+OUTPUT_TEXT = 1
+OUTPUT_HTML = 2
 
 class Tutor(GPT):
     def __init__(self):
@@ -19,6 +21,7 @@ class Tutor(GPT):
         self.last_question = ''
         self.last_answer = ''
         self.status = STATUS_NEXT_QUESTION
+        self.output_format = OUTPUT_TEXT
 
     def get_prompt(self):
         if self.status == STATUS_NEXT_QUESTION:
@@ -66,7 +69,7 @@ class Tutor(GPT):
         reply = message.content()
         if reply['type'] == 'analysis' and settings.get_settings().get('play_audio') == '1':
             sentence = self.last_answer if reply['verdict'] == 'right' else reply['right_answer']
-            say(sentence, language=settings.get_settings()['language'])
+            # say(sentence, language=settings.get_settings()['language'])
 
 
 def handle_level(level: str):
