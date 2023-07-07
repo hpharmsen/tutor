@@ -1,4 +1,4 @@
-# GPT chat
+# Language tutor
 
 Basic REPL to chat with the GPT models and a specific implemention that uses these models to help you learn a new language.
 
@@ -16,7 +16,7 @@ OPENAI_API_KEY=your-openai-api-key
 OPENAI_ORGANIZATION=your-openai-organization-id
 ```
 
-## Language tutor
+## Usage
 ```bash
 python tutor.py
 ```
@@ -36,12 +36,7 @@ You can also use these special commands which each start with a colon:
 | :reset                            | resets the conversation                                             |
 | :load _name_                      | loads the saved conversation with the specified name                |
 | :save _name_                      | saves the conversation under the specified name                     |
-| :input _filename_                 | loads an input from the specified file                              |
 | :model _gpt-4_                    | Sets the AI model                                                   |
 | :max_tokens _800_                 | The maximum number of tokens to generate in the completion          |
-| :temperature _0.9_                | What sampling temperature to use, between 0 and 2                   |
-| :n _1_                            | Specifies the number answers given                                  |
-| :stop _["\n", " Human:", " AI:"]_ | Up to 4 sequences where the API will stop generating further tokens |
-| :bye                              | quits but saves the conversation first                              |
 | :exit or :quit                    | quits the program                                                   |
 
