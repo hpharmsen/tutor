@@ -3,9 +3,10 @@ import sys
 
 from gpteasy import GPT, Repl, CommandHandler
 import gpteasy.display as gpt_display
+
 try:
     import tutor.settings as settings
-except:
+except ImportError:
     import settings
 # from synthesize import say
 
@@ -14,6 +15,7 @@ STATUS_ANSWER = 2
 
 OUTPUT_TEXT = 1
 OUTPUT_HTML = 2
+
 
 class Tutor(GPT):
     def __init__(self):
@@ -64,15 +66,16 @@ class Tutor(GPT):
                     hard_concept = {'question': self.last_question, 'answer': prompt, 'analysis': reply['response']}
                     self.hard_concepts.append(hard_concept)
                 self.status = STATUS_NEXT_QUESTION
-                self.messages = [] # Clear the message history. Old sentences only increase token count
+                self.messages = []  # Clear the message history. Old sentences only increase token count
         message.text = reply['response']
         return message
 
     def after_response(self, message):
-        reply = message.content()
-        if reply['type'] == 'analysis' and settings.get_settings().get('play_audio') == '1':
-            sentence = self.last_answer if reply['verdict'] == 'right' else reply['right_answer']
-            # say(sentence, language=settings.get_settings()['language'])
+        pass
+        # reply = message.content()
+        # if reply['type'] == 'analysis' and settings.get_settings().get('play_audio') == '1':
+        #     sentence = self.last_answer if reply['verdict'] == 'right' else reply['right_answer']
+        #     # say(sentence, language=settings.get_settings()['language'])
 
 
 def handle_level(level: str):
@@ -96,7 +99,7 @@ if __name__ == "__main__":
                             f"Here's your first sentence:\n", color=gpt_display.SYSTEM_COLOR)
     gpt = Tutor()
     gpt.model = s['model']
-    gpt.debug = True
+    gpt.debug = s['debug']
 
     # Load session if passed as a command line argument
     if len(sys.argv) > 1:
@@ -106,8 +109,8 @@ if __name__ == "__main__":
     command_handler = CommandHandler(gpt)
     command_handler.add_command('level', handle_level, ":level - Set the language level (A1..C2)")
 
-
     # Start the interactive prompt
     repl = Repl(gpt, command_handler.handle_command)
     repl.get_prompt = gpt.get_prompt  # partial(gpt.get_prompt, repl=repl)
+    # repl.show_token_count = True  # Display how many tokens were used in each call
     repl.run()

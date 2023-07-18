@@ -6,6 +6,7 @@ from pathlib import Path
 
 WORDS_PER_LEVEL = {'A1': 500, 'A2': 1000, 'B1': 2000, 'B2': 4000, 'C1': 8000, 'C2': 16000}
 
+
 _settings = None
 def get_settings():
     global _settings
