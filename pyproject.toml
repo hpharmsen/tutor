@@ -24,7 +24,6 @@ dependencies = [
     #"PyObjC"
 ]
 requires-python = ">=3.10"
-include_package_data = "true"
 
 [project.optional-dependencies]
 dev = ["black", "pytest", "build", "twine", "nox"]
@@ -34,9 +33,10 @@ Homepage = "https://github.com/hpharmsen/tutor"
 
 [tool.setuptools.packages.find]
 where = ["."]  # list of folders that contain the packages (["."] by default)
-include = ["tutor"]  # package names should match these glob patterns (["*"] by default)
+include = ["tutor", "tutor.words.txt"]  # package names should match these glob patterns (["*"] by default)
 exclude = []  # exclude packages matching these glob patterns (empty by default)
 namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 
 [tool.setuptools.package-data]
-words = ["tutor.words.txt"]
+"*" = ["*.txt"]
+tutor = ["words.txt"]
