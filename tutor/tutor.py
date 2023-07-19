@@ -28,23 +28,26 @@ class Tutor(GPT):
         self.status = STATUS_NEXT_QUESTION
         self.output_format = OUTPUT_TEXT
 
-    def get_prompt(self):
-        if self.status == STATUS_NEXT_QUESTION:
-            # Auto advance to the next prompt
-            if len(self.hard_concepts) > 2:
-                hard_concept = self.hard_concepts.pop(0)
-                prompt = f"""You previously asked "{hard_concept['question']}" and I answered "{hard_concept['answer']}"
-                Your analysis was: "{hard_concept['analysis']}"
+    def autoprompt(self):
+        if self.status != STATUS_NEXT_QUESTION:
+            return
+        # Auto advance to the next prompt
+        if len(self.hard_concepts) > 2:
+            hard_concept = self.hard_concepts.pop(0)
+            prompt = f"""You previously asked "{hard_concept['question']}" and I answered "{hard_concept['answer']}"
+            Your analysis was: "{hard_concept['analysis']}"
 
-                Generate a new sentence that includes one or more of the concepts I got wrong"""
-            else:
-                prompt = "Generate a new sentence"
-            prompt += f"\ninclude the word {settings.random_word()}"
+            Generate a new sentence that includes one or more of the concepts I got wrong"""
         else:
+            prompt = "Generate a new sentence"
+        prompt += f"\ninclude the word {settings.random_word()}"
+        return prompt
+
+    def get_prompt(self):
+        prompt = self.autoprompt()
+        while not prompt:
             # Ask the user for a prompt
-            prompt = ''
-            while not prompt:
-                prompt = input(f"{settings.get_settings()['language']}: ")
+            prompt = input(f"{settings.get_settings()['language']}: ")
         return prompt
 
     def chat(self, prompt, add_to_messages=True):
