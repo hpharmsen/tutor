@@ -24,7 +24,7 @@ dependencies = [
     #"PyObjC"
 ]
 requires-python = ">=3.10"
-include_package_data = True
+include_package_data = "true"
 
 [project.optional-dependencies]
 dev = ["black", "pytest", "build", "twine", "nox"]
