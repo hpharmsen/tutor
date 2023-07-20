@@ -102,7 +102,7 @@ if __name__ == "__main__":
                             f"Here's your first sentence:\n", color=gpt_display.SYSTEM_COLOR)
     gpt = Tutor()
     gpt.model = s['model']
-    gpt.debug = s['debug']
+    gpt.debug = int(s['debug'])
 
     # Load session if passed as a command line argument
     if len(sys.argv) > 1:

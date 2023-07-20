@@ -16,7 +16,7 @@ def get_settings():
             config_object.read_file(f)
         _settings = {t[0]: t[1] for t in config_object.items('general')}
         language = _settings['language']
-        _settings.update({t[0]: t[1] for t in config_object.items(language)})
+        _settings.update({t[0]: t[1] for t in config_object.items('examples')})
     return _settings
 
 
