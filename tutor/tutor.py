@@ -103,6 +103,7 @@ if __name__ == "__main__":
     gpt = Tutor()
     gpt.model = s['model']
     gpt.debug = int(s['debug'])
+    gpt.language = s['language']
 
     # Load session if passed as a command line argument
     if len(sys.argv) > 1:
