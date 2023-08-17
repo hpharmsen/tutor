@@ -64,6 +64,7 @@ Your answer will be like this:
 
 {text_about_diacriticals}
 When I give the right answer, make your next sentence a little more complex.
+When I give a wrong answer, make your next sentence a little less complex.
 
 next
 {sentence_json("She is reading a book at the library")}
