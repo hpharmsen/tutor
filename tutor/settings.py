@@ -4,6 +4,8 @@ import json
 import random
 from pathlib import Path
 
+from prompts import prompt
+
 WORDS_PER_LEVEL = {'A1': 500, 'A2': 1000, 'B1': 2000, 'B2': 4000, 'C1': 8000, 'C2': 16000}
 
 
@@ -16,11 +18,14 @@ def get_settings():
             config_object.read_file(f)
         _settings = {t[0]: t[1] for t in config_object.items('general')}
         language = _settings['language']
-        _settings.update({t[0]: t[1] for t in config_object.items('examples')})
+        #_settings.update({t[0]: t[1] for t in config_object.items('examples')})
     return _settings
 
 
 def system_message():
+    s = get_settings()
+    return prompt('SYSTEM2', language=s['language'], level=s['level'])
+
     def analysis_json(verdict, analysis, right_anwer=""):
         data = {"type": "analysis", "verdict": verdict, "response": analysis}
         if right_anwer:
@@ -34,70 +39,48 @@ def system_message():
         return json.dumps({"type": "sentence", "response": text}, ensure_ascii=False)
 
     s = get_settings()
-    text_about_diacriticals = """Ignore the the use of diacritical characters in my responses 
-        so for example regard o and ó as the same.
-        Don't lecture me on accents. Just regard á and a as the same. Regard ñ and n as the same. Also regard í and i as the same.
-        Do not bother me about question marks "¿" at the beginning of the question.
-        """ if s.get('ignore_diacriticals') == '1' else ''
-    analysis4 = s['analysis4'].replace('\\n', '\n')
+    text_about_diacriticals = prompt('text_about_diacriticals') if s.get('ignore_diacriticals') == '1' else ''
 
-    system_message = f"""You are a {s['language']} language tutor. 
-You are tutoring me in {s['language']} on {s['level']} level. 
-You provide me with sentences in English which I will have to translate into {s['language']}. 
-Always provide your answer in JSON format.
+    question1 = sentence_json(prompt('question1'))
+    question2 = sentence_json(prompt('question2'))
+    question3 = sentence_json(prompt('question3'))
+    question4 = sentence_json(prompt('question4'))
 
-You can provide three types of response.
-1. When I type "next" you provide a new sentence for me to translate and the type is "sentence"
-like this:
+    answer1 = prompt('answer1')
+    answer2 = prompt('answer2')
+    answer3 = prompt('answer3')
+    answer4 = prompt('answer4')
 
-next
-{sentence_json("She is reading a book at the library")}
+    special_question = prompt('special_question')
+    special_answer = prompt('special_answer')
 
-2. When I give a translation in {s['language']} you analyse my answer and respond with how I did and 
-you explain all that I did wrong and how to prevent that in the future. In this case the type is "analysis" 
-and the verdict is "right" or "wrong" depending on whether I translated the sentence well or not. 
-Your answer will be like this:
-{analysis_json('wrong', s['analysis1'], s['right_answer1'])}
+    analysis1 = analysis_json('wrong', prompt('analysis1'), prompt('right_answer1'))
+    analysis2 = analysis_json('right', prompt('analysis2'))
+    analysis3 = analysis_json('wrong', prompt('analysis3'), prompt('right_answer3'))
+    analysis4 = analysis_json('wrong', prompt('analysis3'), prompt('right_answer4'))
 
-3. When I ask a question or make a remark you respond with a type "other" like this:
-{other_json(s['special_answer'])}
+    right_answer1 = prompt('right_answer1')
+    right_answer2 = prompt('right_answer2')
+    right_answer3 = prompt('right_answer3')
+    right_answer4 = prompt('right_answer4')
 
-{text_about_diacriticals}
-When I give the right answer, make your next sentence a little more complex.
-When I give a wrong answer, make your next sentence a little less complex.
-
-next
-{sentence_json("She is reading a book at the library")}
-{s['answer1']}
-{analysis_json('wrong', s['analysis1'], s['right_answer1'])}
-
-next
-{sentence_json("The movie we watched last night was very interesting")} 
-{s['answer2']}
-{analysis_json('right', s['analysis2'])}
-
-next
-{sentence_json("My brother and I are going to travel to Spain next summer.")}
-What is to travel in {s['language']}?
-{other_json(s['special_answer'])}
-{s['answer3']}
-{analysis_json('wrong', s['analysis3'], s['right_answer3'])}
-
-next 
-{sentence_json("Our teaches speaks many languages")}
-{s['answer4']}
-{analysis_json('wrong', analysis4, s['right_answer4'])}
-"""
+    system_message = prompt('SYSTEM', language=s['language'], level=s['level'],
+                            question1=question1, question2=question2, question3=question3, question4=question4,
+                            answer1=answer1, answer2=answer2, answer3=answer3, answer4=answer4,
+                            analysis1=analysis1, analysis2=analysis2, analysis3=analysis3, analysis4=analysis4,
+                            right_answer1=right_answer1, right_answer2=right_answer2, right_answer3=right_answer3,
+                            right_answer4=right_answer4, special_question=special_question,
+                            special_answer=special_answer, text_about_diacriticals=text_about_diacriticals)
     return system_message
 
 
 _words = []
-def random_word():
+def random_word(language="nl"):
     global _words
     if not _words:
         s = get_settings()
         # How many words we include in the list depends on the level of the user
         max_words = WORDS_PER_LEVEL[s['level']]
-        with open(Path(__file__).resolve().parent / "words.txt", 'r') as f:
+        with open(Path(__file__).resolve().parent / f"words_{language}.txt", 'r') as f:
             _words = f.read().splitlines()[:max_words]
     return random.choice(_words)

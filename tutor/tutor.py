@@ -1,13 +1,23 @@
 """ The main program for the language tutor """
+import json
 import sys
+from dataclasses import dataclass
 
+from dataclasses_jsonschema import JsonSchemaMixin
 from gpteasy import GPT, Repl, CommandHandler
 import gpteasy.display as gpt_display
 
-try:
-    import tutor.settings as settings
-except ImportError:
-    import settings
+from prompts import prompt
+import settings
+
+
+@dataclass
+class Answer(JsonSchemaMixin):
+    type: str
+    verdict: bool
+    response: str
+
+
 # from synthesize import say
 
 STATUS_NEXT_QUESTION = 1
@@ -27,6 +37,7 @@ class Tutor(GPT):
         self.last_answer = ''
         self.status = STATUS_NEXT_QUESTION
         self.output_format = OUTPUT_TEXT
+        self.set_return_type(Answer)
 
     def autoprompt(self):
         if self.status != STATUS_NEXT_QUESTION:
@@ -34,14 +45,14 @@ class Tutor(GPT):
         # Auto advance to the next prompt
         if len(self.hard_concepts) > 2:
             hard_concept = self.hard_concepts.pop(0)
-            prompt = f"""You previously asked "{hard_concept['question']}" and I answered "{hard_concept['answer']}"
-            Your analysis was: "{hard_concept['analysis']}"
-
-            Generate a new sentence that includes one or more of the concepts I got wrong"""
+            prmpt = prompt("REPEAT_HARD_CONCEPT", question=hard_concept['question'], answer=hard_concept['answer'],
+                             analysis=hard_concept['analysis'])
         else:
-            prompt = "Generate a new sentence"
-        prompt += f"\ninclude the word {settings.random_word()}"
-        return prompt
+            prmpt = "Genereer een nieuwe zin in het Nederlands"
+        if settings.get_settings().get('past_tenses') == '1':
+            prmpt += "\nGebruik in je zinnen altijd de verleden tijd zoadat ik de perfecto, de imperfecto or of de indefinido moet gebruiken"
+        prmpt += f"\nGebruik in je zin het woord {settings.random_word()}"
+        return prmpt
 
     def get_prompt(self):
         prompt = self.autoprompt()
@@ -54,9 +65,10 @@ class Tutor(GPT):
         # Modify prompt here...
         # Check if there's a concept that went wrong last time. If so, include it in the prompt.
 
-        message = super().chat(prompt, add_to_messages=add_to_messages)
+        # print('>>', prompt)
+        reply = super().chat(prompt, add_to_messages=add_to_messages)
 
-        reply = message.content()
+        #reply = message.content()
         match reply['type']:
             case 'sentence':
                 self.status = STATUS_ANSWER
@@ -69,37 +81,28 @@ class Tutor(GPT):
                     hard_concept = {'question': self.last_question, 'answer': prompt, 'analysis': reply['response']}
                     self.hard_concepts.append(hard_concept)
                 self.status = STATUS_NEXT_QUESTION
-                self.messages = []  # Clear the message history. Old sentences only increase token count
-        message.text = reply['response']
-        return message
+                self.messages = self.messages[-1:]  # Truncate the message history. Old sentences only increase token count
+        return reply
 
-    def after_response(self, message):
-        pass
-        # reply = message.content()
-        # if reply['type'] == 'analysis' and settings.get_settings().get('play_audio') == '1':
-        #     sentence = self.last_answer if reply['verdict'] == 'right' else reply['right_answer']
-        #     # say(sentence, language=settings.get_settings()['language'])
+    def after_response(self):
+        message = self.messages[-1]
+        text = json.loads(message.text)['response']
+        gpt_display.print_message(text, 'assistant')
 
 
 def handle_level(level: str):
     level = level.upper()
     accepted_levels = settings.WORDS_PER_LEVEL.keys()
     if level not in accepted_levels:
-        gpt_display.color_print(f"Error: level must be one of {', '.join(accepted_levels)}",
-                                color=gpt_display.SYSTEM_COLOR)
+        gpt_display.print_message(f"Error: level must be one of {', '.join(accepted_levels)}", 'system')
     else:
         settings.get_settings()['level'] = level
-        gpt_display.color_print(f'language level set to {level}', color=gpt_display.SYSTEM_COLOR)
+        gpt_display.print_message(f'language level set to {level}','system')
     return True
 
 
 if __name__ == "__main__":
     s = settings.get_settings()
-    gpt_display.color_print(f"Hello, I am your {s['language']} tutor on {s['level']} level. " +
-                            f"I will help you learn {s['language']}.\n" +
-                            f"I will give you sentences in English " +
-                            f"and you will have to translate them into {s['language']}.\n" +
-                            f"Here's your first sentence:\n", color=gpt_display.SYSTEM_COLOR)
     gpt = Tutor()
     gpt.model = s['model']
     gpt.debug = int(s['debug'])
@@ -112,6 +115,9 @@ if __name__ == "__main__":
     # Add a command handler that handles special commands like model parameters and system settings
     command_handler = CommandHandler(gpt)
     command_handler.add_command('level', handle_level, ":level - Set the language level (A1..C2)")
+
+    intro = prompt('INTRO', language=s['language'], level=s['level'])
+    gpt_display.print_message(intro, 'system')
 
     # Start the interactive prompt
     repl = Repl(gpt, command_handler.handle_command)
