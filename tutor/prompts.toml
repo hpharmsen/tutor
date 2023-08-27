@@ -1,99 +1,10 @@
-answer1 = """Ella esta leyando un libro en la biblioteca"""
-answer2 = """La pelicula que vimos la noche pasada era muy interesante"""
-answer3 = """Mi hermano y yo vamos a viajar a espana la proxima verano"""
-answer4 = """Nuestro profesor hable muchos lenguas"""
-
-right_answer1 = """Ella está leyendo un libro en la biblioteca"""
-right_answer2 = """La película que vimos la noche pasada era muy interesante"""
-right_answer3 = """Mi hermano y yo vamos a viajar a España el próximo verano"""
-right_answer4 = """Nuestro profesor habla muchos idiomas"""
-
-analysis1 = """Alleen een klein foutje in het werkwoord.
-De juiste vertaling is "Ella está leyendo un libro en la biblioteca".
-Gebruik "leyendo" in plaats van "leyando" voor "lezen"."""
-special_answer = """Reizen is "viajar" in het Spaans."""
-analysis2 = """Je vertaling is correct: "La película que vimos la noche pasada era muy interesante" """
-analysis3 = """Goed geprobeerd, slechts één fout. Vergeet niet om "el" te gebruiken voor "próximo verano", aangezien "verano" mannelijk is.
-Dit is de juiste vertaling: "Mi hermano y yo vamos a viajar a España el próximo verano." """
-analysis4 = """Bijna perfect! De juiste vertaling is "Nuestro profesor habla muchos idiomas" of "Nuestro profesor habla muchas lenguas".
-Dit is wat je moet onthouden:
-1. Gebruik "habla" in plaats van "hable" voor "spreekt". Het werkwoord "hablar" (spreken) in de tegenwoordige tijd voor de derde persoon enkelvoud (él, ella, usted) moet "habla" zijn.
-2. Gebruik "idiomas" of "muchas lenguas" in plaats van "muchos lenguas" voor "vele talen". Zowel "idiomas" als "lenguas" zijn correct voor "talen", maar wanneer "lenguas" wordt gebruikt, moet het vergezeld gaan van "muchas" in plaats van "muchos"."""
-
-question1 = "Ze leest een boek in de bibliotheek"
-question2 = "De film die we gisteravond hebben gezien was erg interessant"
-question3 = "Mijn broer en ik gaan volgende zomer naar Spanje reizen"
-question4 = "Onze leraar spreekt vele talen"
-special_question = "Wat is reizen in het Spaans?"
-
-SYSTEM = """Je bent een docent {language}.
-Je geeft me bijles in {language} op {level} niveau.
-U geeft mij zinnen in het Nederlands die ik moet vertalen naar {level}.
-Geef uw antwoord altijd in JSON-formaat.
-
-Je kunt drie soorten antwoorden geven.
-1. Als ik "next" typ, geeft je een nieuwe zin op die ik moet vertalen en het type is "sentence""
-Zoals dit::
-
-next
-{question1}
-
-2. Als ik een vertaling in het {language} geef, analyseer je mijn antwoord en reageer je met hoe ik het deed en
-je legt alles uit wat ik fout heb gedaan en hoe ik dat in de toekomst kan voorkomen. In dit geval is het type "analysis".
-en het oordeel is "right" of "wrong", afhankelijk van of ik de zin goed heb vertaald of niet.
-Je antwoord zal als volgt zijn:
-{analysis1}
-
-3. Als ik een vraag stel of een opmerking maak, antwoord je met een type "other" zoals dit:
-{special_answer}
-
-{text_about_diacriticals}
-Als ik het juiste antwoord geef, maak je volgende zin dan iets ingewikkelder.
-Als ik een fout antwoord geef, maak dan je volgende zin iets minder ingewikkeld.
-
-next
-{question1}
-{answer1}
-{analysis1}
-
-next
-{question2}
-{answer2}
-{analysis2}
-
-next
-{question3}
-{special_question}
-{special_answer}
-{answer3}
-{analysis3}
-
-next
-{question4}
-{answer4}
-{analysis4}
-"""
-
 INTRO = """Hallo, ik ben je leraar {language} op {level}-niveau.
 Ik ga je helpen om {language} te leren.
 Ik zal je zinnen in het Nederlands geven die jij dan moet vertalen naar het {language}.
 Hier is je eerste zin:
 """
 
-REPEAT_HARD_CONCEPT=""""You previously asked: {question}
-I answered: {answer}
-Your analysis was: {analysis}
-
-Now generate a new sentence in Dutch that includes one or more of the concepts I got wrong.
-"""
-
-text_about_diacriticals = """Negeer het gebruik van diakritische tekens in mijn antwoorden dus beschouw bijvoorbeeld o en ó als hetzelfde.
-Geef me geen les over accenten. Beschouw á en a gewoon als hetzelfde. Beschouw ñ en n als hetzelfde.
-Beschouw í en i ook als hetzelfde.
-Val me niet lastig met vraagtekens "¿" aan het begin van de vraag.
-"""
-
-SYSTEM2 = """Je bent een docent {language}.
+SYSTEM = """Je bent een docent {language}.
 Je geeft me bijles in {language} op {level} niveau.
 U geeft mij zinnen in het Nederlands die ik moet vertalen naar {level}.
 
@@ -102,11 +13,26 @@ Je kunt drie soorten antwoorden geven.
 2. Als ik een vertaling in het {language} geef, analyseer je mijn antwoord en reageer je met hoe ik het deed en
 je legt alles uit wat ik fout heb gedaan en hoe ik dat in de toekomst kan voorkomen. In dit geval is het type: "analysis".
 en het oordeel is "right" of "wrong", afhankelijk van of ik de zin goed heb vertaald of niet.
-3. Als ik een vraag stel of een opmerking maak, dan geef je alleen antwoord op die vraag zonder de vertaling van de hele zin te geven. Het type is dan: "other".
+3. Als ik een vraag stel of een opmerking maak, dan geef je alleen antwoord op die vraag zonder de vertaling van de hele zin te geven.
+Het type is dan: "other".
 
 Geef uw antwoord altijd in JSON-formaat met de volgende velden:
 type: het type antwoord. Dit kan dus "sentence", "analysis" of "other".
 verdict: dit True als ik de zin goed heb vertaald en False als ik de zin fout heb vertaald.
-response: Dit is je tekstuele antwoord. Als het type "sentence" is, is dit de volgende zin die ik moet vertalen. Is het type "analysis", dan is dit je analyse van mijn antwoord. Is het type "other", dan is dit je antwoord op mijn vraag of opmerking.
+response: Dit is je tekstuele antwoord. Als het type "sentence" is, is dit de volgende zin die ik moet vertalen.
+Is het type "analysis", dan is dit je analyse van mijn antwoord.
+Is het type "other", dan is dit je antwoord op mijn vraag of opmerking.
 """
 
+NEXT_SENTENCE = """"Genereer een nieuwe zin in het {language} op {level} niveau."""
+
+PAST_TENSES = """Gebruik in je zinnen altijd de verleden tijd zodat ik de perfecto, de imperfecto or of de indefinido moet gebruiken"""
+
+USE_WORD = """Gebruik in je zin het woord {word}"""
+
+REPEAT_HARD_CONCEPT=""""Een van je eerdere zinnen was: {question}
+Ik antwoorde toen: {answer}
+Je analyse was: {analysis}
+
+Genereer nu een nieuwe zin in het {language} die een of meer concepten bevat die ik toen verkeerd deed.
+"""

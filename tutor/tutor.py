@@ -46,12 +46,12 @@ class Tutor(GPT):
         if len(self.hard_concepts) > 2:
             hard_concept = self.hard_concepts.pop(0)
             prmpt = prompt("REPEAT_HARD_CONCEPT", question=hard_concept['question'], answer=hard_concept['answer'],
-                             analysis=hard_concept['analysis'])
+                           analysis=hard_concept['analysis'], language=s['language'])
         else:
-            prmpt = "Genereer een nieuwe zin in het Nederlands"
+            prmpt = prompt("NEXT_SENTENCE", language=s['language'], level=s['level'])
         if settings.get_settings().get('past_tenses') == '1':
-            prmpt += "\nGebruik in je zinnen altijd de verleden tijd zoadat ik de perfecto, de imperfecto or of de indefinido moet gebruiken"
-        prmpt += f"\nGebruik in je zin het woord {settings.random_word()}"
+            prmpt += "\n" + prompt("PAST_TENSES")
+        prmpt += "\n" + prompt("USE_WORD", word=settings.random_word())
         return prmpt
 
     def get_prompt(self):
@@ -65,10 +65,8 @@ class Tutor(GPT):
         # Modify prompt here...
         # Check if there's a concept that went wrong last time. If so, include it in the prompt.
 
-        # print('>>', prompt)
         reply = super().chat(prompt, add_to_messages=add_to_messages)
 
-        #reply = message.content()
         match reply['type']:
             case 'sentence':
                 self.status = STATUS_ANSWER
@@ -81,7 +79,7 @@ class Tutor(GPT):
                     hard_concept = {'question': self.last_question, 'answer': prompt, 'analysis': reply['response']}
                     self.hard_concepts.append(hard_concept)
                 self.status = STATUS_NEXT_QUESTION
-                self.messages = self.messages[-1:]  # Truncate the message history. Old sentences only increase token count
+                self.messages = self.messages[-1:]  # Truncate message history. Old sentences only increase token count
         return reply
 
     def after_response(self):
@@ -97,7 +95,7 @@ def handle_level(level: str):
         gpt_display.print_message(f"Error: level must be one of {', '.join(accepted_levels)}", 'system')
     else:
         settings.get_settings()['level'] = level
-        gpt_display.print_message(f'language level set to {level}','system')
+        gpt_display.print_message(f'language level set to {level}', 'system')
     return True
 
 
