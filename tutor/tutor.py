@@ -4,10 +4,9 @@ import sys
 from dataclasses import dataclass
 
 from dataclasses_jsonschema import JsonSchemaMixin
-from gpteasy import GPT, Repl, CommandHandler
+from gpteasy import GPT, Repl, CommandHandler, prompt
 import gpteasy.display as gpt_display
 
-from prompts import prompt
 import settings
 
 

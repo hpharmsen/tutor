@@ -1,12 +1,13 @@
 """ Settings object for the language tutor. Main purpose is to provide the system message for the AI. """
+import os
 import configparser
 import random
 from pathlib import Path
 
-from prompts import prompt
+from gpteasy import prompt, set_prompt_file
 
 WORDS_PER_LEVEL = {'A1': 500, 'A2': 1000, 'B1': 2000, 'B2': 4000, 'C1': 8000, 'C2': 16000}
-
+set_prompt_file(os.path.join(os.path.dirname(__file__), 'prompts.toml'))
 
 _settings = None
 def get_settings():
