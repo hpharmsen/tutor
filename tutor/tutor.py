@@ -7,7 +7,7 @@ from dataclasses_jsonschema import JsonSchemaMixin
 from gpteasy import GPT, Repl, CommandHandler, prompt
 import gpteasy.display as gpt_display
 
-import settings
+import tutor.settings as settings
 
 
 @dataclass
