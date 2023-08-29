@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from dataclasses_jsonschema import JsonSchemaMixin
 from gpteasy import GPT, Repl, CommandHandler, prompt
 import gpteasy.display as gpt_display
+import openai
 
 import tutor.settings as settings
 
@@ -65,6 +66,9 @@ class Tutor(GPT):
         # Check if there's a concept that went wrong last time. If so, include it in the prompt.
 
         reply = super().chat(prompt, add_to_messages=add_to_messages)
+
+        if type(reply) == str:  # Zou eigenlijk niet voor moeten komen maar gebeurt toch...
+            reply = {'type': 'sentence', 'response': reply}
 
         match reply['type']:
             case 'sentence':
