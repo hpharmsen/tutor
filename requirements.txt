@@ -3,4 +3,3 @@ gpteasy
 #playsound
 python-dateutil
 #PyObjC
-dataclasses-jsonschema

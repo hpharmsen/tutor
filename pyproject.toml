@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tutor"
-version = "1.5"
+version = "1.4"
 description = "Language tutor for learning languages with GPT"
 readme = "README.md"
 authors = [{ name = "HP Harmsen", email = "hp@harmsen.nl" }]
@@ -33,10 +33,10 @@ Homepage = "https://github.com/hpharmsen/tutor"
 
 [tool.setuptools.packages.find]
 where = ["."]  # list of folders that contain the packages (["."] by default)
-include = ["tutor", "tutor.words_en.txt", "tutor.words_nl.txt"]  # package names should match these glob patterns (["*"] by default)
+include = ["tutor", "tutor.words.txt"]  # package names should match these glob patterns (["*"] by default)
 exclude = []  # exclude packages matching these glob patterns (empty by default)
 namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 
 [tool.setuptools.package-data]
 "*" = ["*.txt"]
-tutor = ["words_en.txt", "words_nl.txt", "prompts.toml"]
+tutor = ["words.txt"]
