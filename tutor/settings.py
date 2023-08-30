@@ -80,6 +80,6 @@ def random_word():
         s = get_settings()
         # How many words we include in the list depends on the level of the user
         max_words = WORDS_PER_LEVEL[s['level']]
-        with open(Path(__file__).resolve().parent / "words.txt", 'r') as f:
+        with open(Path(__file__).resolve().parent / "words_nl.txt", 'r') as f:
             _words = f.read().splitlines()[:max_words]
     return random.choice(_words)

@@ -32,10 +32,10 @@ Je geeft me zinnen in het Nederlands die ik moet vertalen naar het {language}.
 Geef je antwoord altijd in JSON-formaat.
 
 Je kunt drie soorten antwoorden geven.
-1. Als ik "next" typ, geeft je een nieuwe zin op die ik moet vertalen en het type is "sentence""
+1. Als ik daarom vraag, geeft je een nieuwe zin op die ik moet vertalen en het type is "sentence""
 Zoals dit:
 
-next
+Geef me de volgende zin die ik moet vertalen
 {question1}
 
 2. Als ik een vertaling in het {language} geef, analyseer je mijn antwoord en reageer je met hoe ik het deed en
@@ -59,24 +59,24 @@ Als ik een fout antwoord geef, maak dan je volgende zin iets minder ingewikkeld.
 --
 Voorbeelden:
 
-next
+Geef me de volgende zin die ik moet vertalen
 {question1}
 {answer1}
 {analysis1}
 
-next
+Geef me de volgende zin die ik moet vertalen
 {question2}
 {answer2}
 {analysis2}
 
-next
+Geef me de volgende zin die ik moet vertalen
 {question3}
 {special_question}
 {special_answer}
 {answer3}
 {analysis3}
 
-next
+Geef me de volgende zin die ik moet vertalen
 {question4}
 {answer4}
 {analysis4}
@@ -88,7 +88,12 @@ Ik zal je zinnen in het Nederlands geven die jij dan moet vertalen naar het {lan
 Hier is je eerste zin:
 """
 
-REPEAT_HARD_CONCEPT=""""Eerder gaf je met deze zin: {question}
+NEXT_SENTENCE = "Geef me de volgende zin die ik moet vertalen"
+
+INCLUDE_WORD = """Gebruik in je zin het woord {word} zodat ik het moet vertalen."""
+
+
+REPEAT_HARD_CONCEPT = """"Eerder gaf je met deze zin: {question}
 Ik gaf toen dit als antwoord: {answer}
 Je analyse was: {analysis}
 

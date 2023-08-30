@@ -2,7 +2,7 @@
 import json
 import sys
 
-from gpteasy import GPT, Repl, CommandHandler
+from gpteasy import GPT, Repl, CommandHandler, prompt
 import gpteasy.display as gpt_display
 
 try:
@@ -34,29 +34,26 @@ class Tutor(GPT):
             return
         # Auto advance to the next prompt
         if len(self.hard_concepts) > 2:
+            s = settings.get_settings()
             hard_concept = self.hard_concepts.pop(0)
-            prompt = f"""You previously asked "{hard_concept['question']}" and I answered "{hard_concept['answer']}"
-            Your analysis was: "{hard_concept['analysis']}"
-
-            Generate a new sentence that includes one or more of the concepts I got wrong"""
+            p = prompt("REPEAT_HARD_CONCEPT", question=hard_concept['question'],
+                             answer=hard_concept['answer'], analysis=hard_concept['analysis'], language=s['language'])
         else:
-            prompt = "Generate a new sentence"
-        prompt += f"\ninclude the word {settings.random_word()}"
-        return prompt
+            p = prompt("NEXT_SENTENCE")
+        p += prompt("INCLUDE_WORD", word=settings.random_word())
+        return p
 
     def get_prompt(self):
-        prompt = self.autoprompt()
-        while not prompt:
+        p = self.autoprompt()
+        while not p:
             # Ask the user for a prompt
-            prompt = input(f"{settings.get_settings()['language']}: ")
-        return prompt
+            p = input(f"{settings.get_settings()['language']}: ")
+        return p
 
-    def chat(self, prompt, add_to_messages=True):
-        # Modify prompt here...
-        # Check if there's a concept that went wrong last time. If so, include it in the prompt.
-
-        reply = super().chat(prompt, add_to_messages=add_to_messages)
-        reply = json.loads(reply)
+    def chat(self, p, add_to_messages=True):
+        reply = super().chat(p, add_to_messages=add_to_messages)
+        if reply.count('{') and reply.count('}'):
+            reply = json.loads('{' + reply.split('{',1)[1].rsplit('}',1)[0] + '}')
 
         match reply['type']:
             case 'sentence':
@@ -65,9 +62,9 @@ class Tutor(GPT):
             case 'other':
                 self.status = STATUS_ANSWER
             case 'analysis':
-                self.last_answer = prompt  # Save last answer given by the user in order to play audio if it is correct
+                self.last_answer = p  # Save last answer given by the user in order to play audio if it is correct
                 if reply['verdict'] == 'wrong':
-                    hard_concept = {'question': self.last_question, 'answer': prompt, 'analysis': reply['response']}
+                    hard_concept = {'question': self.last_question, 'answer': p, 'analysis': reply['response']}
                     self.hard_concepts.append(hard_concept)
                 self.status = STATUS_NEXT_QUESTION
                 self.messages = self.messages[-1:]  # Truncate message history. Old sentences only increase token count
