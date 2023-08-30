@@ -39,4 +39,4 @@ namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 
 [tool.setuptools.package-data]
 "*" = ["*.txt"]
-tutor = ["words.txt"]
+tutor = ["words_en.txt", "words_nl.txt", "prompts.toml"]
