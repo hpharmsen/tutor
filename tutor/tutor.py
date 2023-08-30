@@ -6,9 +6,11 @@ from dataclasses import dataclass
 from dataclasses_jsonschema import JsonSchemaMixin
 from gpteasy import GPT, Repl, CommandHandler, prompt
 import gpteasy.display as gpt_display
-import openai
 
-import tutor.settings as settings
+try:
+    import tutor.settings as settings
+except ModuleNotFoundError:
+    import settings
 
 
 @dataclass
