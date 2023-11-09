@@ -37,7 +37,7 @@ class Tutor(GPT):
             s = settings.get_settings()
             hard_concept = self.hard_concepts.pop(0)
             p = get_prompt("REPEAT_HARD_CONCEPT", question=hard_concept['question'],
-                             answer=hard_concept['answer'], analysis=hard_concept['analysis'], language=s['language'])
+                             answer=hard_concept['answer'], analysis=hard_concept['analysis'], language=s['target_language'])
         else:
             p = get_prompt("NEXT_SENTENCE")
         p += get_prompt("INCLUDE_WORD", word=settings.random_word())
@@ -47,7 +47,7 @@ class Tutor(GPT):
         p = self.autoprompt()
         while not p:
             # Ask the user for a prompt
-            p = input(f"{settings.get_settings()['language']}: ")
+            p = input(f"{settings.get_settings()['target_language']}: ")
         return p
 
     def chat(self, p, add_to_messages=True):
@@ -87,21 +87,21 @@ def handle_level(level: str):
                                 color=gpt_display.SYSTEM_COLOR)
     else:
         settings.get_settings()['level'] = level
-        gpt_display.color_print(f'language level set to {level}', color=gpt_display.SYSTEM_COLOR)
+        gpt_display.color_print(f'Level set to {level}', color=gpt_display.SYSTEM_COLOR)
     return True
 
 
 if __name__ == "__main__":
     s = settings.get_settings()
-    gpt_display.color_print(f"Hello, I am your {s['language']} tutor on {s['level']} level. " +
-                            f"I will help you learn {s['language']}.\n" +
+    gpt_display.color_print(f"Hello, I am your {s['target_language']} tutor on {s['level']} level. " +
+                            f"I will help you learn {s['target_language']}.\n" +
                             f"I will give you sentences in English " +
-                            f"and you will have to translate them into {s['language']}.\n" +
+                            f"and you will have to translate them into {s['target_language']}.\n" +
                             f"Here's your first sentence:\n", color=gpt_display.SYSTEM_COLOR)
     gpt = Tutor()
     gpt.model = s['model']
     gpt.debug = int(s['debug'])
-    gpt.language = s['language']
+    gpt.language = s['target_language']
 
     # Load session if passed as a command line argument
     if len(sys.argv) > 1:
