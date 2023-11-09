@@ -2,7 +2,7 @@
 import json
 import sys
 
-from gpteasy import GPT, Repl, CommandHandler, prompt
+from gpteasy import GPT, Repl, CommandHandler, get_prompt
 import gpteasy.display as gpt_display
 
 try:
@@ -36,11 +36,11 @@ class Tutor(GPT):
         if len(self.hard_concepts) > 2:
             s = settings.get_settings()
             hard_concept = self.hard_concepts.pop(0)
-            p = prompt("REPEAT_HARD_CONCEPT", question=hard_concept['question'],
+            p = get_prompt("REPEAT_HARD_CONCEPT", question=hard_concept['question'],
                              answer=hard_concept['answer'], analysis=hard_concept['analysis'], language=s['language'])
         else:
-            p = prompt("NEXT_SENTENCE")
-        p += prompt("INCLUDE_WORD", word=settings.random_word())
+            p = get_prompt("NEXT_SENTENCE")
+        p += get_prompt("INCLUDE_WORD", word=settings.random_word())
         return p
 
     def get_prompt(self):
@@ -52,8 +52,11 @@ class Tutor(GPT):
 
     def chat(self, p, add_to_messages=True):
         reply = super().chat(p, add_to_messages=add_to_messages)
-        if reply.count('{') and reply.count('}'):
-            reply = json.loads('{' + reply.split('{',1)[1].rsplit('}',1)[0] + '}')
+        if type(reply) == str:
+            if reply.count('{') and reply.count('}'):
+                reply = json.loads('{' + reply.split('{',1)[1].rsplit('}',1)[0] + '}')
+            else:
+                reply = {'type': 'sentence', 'response': reply}
 
         match reply['type']:
             case 'sentence':

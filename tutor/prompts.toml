@@ -51,7 +51,6 @@ Je antwoord zal als volgt zijn:
 
 --
 Extra instructies:
-{text_about_diacriticals}
 Als ik het juiste antwoord geef, maak je volgende zin dan iets ingewikkelder.
 Als ik een fout antwoord geef, maak dan je volgende zin iets minder ingewikkeld.
 {past_tenses}
@@ -98,12 +97,6 @@ Ik gaf toen dit als antwoord: {answer}
 Je analyse was: {analysis}
 
 Genereer nu een nieuwe zin voor me in het {language} waarin een of meer concepten verwerkt zijn die ik eerder verkeerd deed.
-"""
-
-TEXT_ABOUT_DIACRITICALS = """Negeer het gebruik van diakritische tekens in mijn antwoorden dus beschouw bijvoorbeeld o en ó als hetzelfde.
-Geef me geen les over accenten. Beschouw á en a gewoon als hetzelfde. Beschouw ñ en n als hetzelfde.
-Beschouw í en i ook als hetzelfde.
-Val me niet lastig met vraagtekens "¿" aan het begin van de vraag.
 """
 
 PAST_TENSES = "Gebruik in je zinnen altijd de verleden tijd zoadat ik de perfecto, de imperfecto or of de indefinido moet gebruiken"
