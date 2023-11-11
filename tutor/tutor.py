@@ -33,14 +33,17 @@ class Tutor(GPT):
         if self.status != STATUS_NEXT_QUESTION:
             return
         # Auto advance to the next prompt
+        s = settings.get_settings()
         if len(self.hard_concepts) > 2:
-            s = settings.get_settings()
             hard_concept = self.hard_concepts.pop(0)
             p = get_prompt("REPEAT_HARD_CONCEPT", question=hard_concept['question'],
-                             answer=hard_concept['answer'], analysis=hard_concept['analysis'], language=s['target_language'])
+                           answer=hard_concept['answer'], analysis=hard_concept['analysis'],
+                           target_language=s['target_language'])
         else:
             p = get_prompt("NEXT_SENTENCE")
-        p += get_prompt("INCLUDE_WORD", word=settings.random_word())
+        p += get_prompt("INCLUDE_WORD", word=settings.random_word(), native_language=s['native_language'],
+                        target_language=s['target_language']
+                        )
         return p
 
     def get_prompt(self):
@@ -48,6 +51,12 @@ class Tutor(GPT):
         while not p:
             # Ask the user for a prompt
             p = input(f"{settings.get_settings()['target_language']}: ")
+
+        # print('VVVVVVVVVV')
+        # print(self.system())
+        # print('----------' )
+        # print(p)
+        # print('^^^^^^^^^^')
         return p
 
     def chat(self, p, add_to_messages=True):

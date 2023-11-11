@@ -61,7 +61,8 @@ def system_message():
     right_answer3 = get_prompt('right_answer3')
     right_answer4 = get_prompt('right_answer4')
 
-    system_message = get_prompt('SYSTEM', language=s['target_language'], level=s['level'],
+    system_message = get_prompt('SYSTEM', target_language=s['target_language'],
+                            native_language=s['native_language'], level=s['level'],
                             question1=question1, question2=question2, question3=question3, question4=question4,
                             answer1=answer1, answer2=answer2, answer3=answer3, answer4=answer4,
                             analysis1=analysis1, analysis2=analysis2, analysis3=analysis3, analysis4=analysis4,
