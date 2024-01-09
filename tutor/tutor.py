@@ -1,8 +1,9 @@
 """ The main program for the language tutor """
 import json
 import sys
+from pathlib import Path
 
-from gpteasy import GPT, Repl, CommandHandler, get_prompt
+from gpteasy import GPT, Repl, CommandHandler, get_prompt, set_prompt_file
 import gpteasy.display as gpt_display
 
 try:
@@ -21,6 +22,7 @@ OUTPUT_HTML = 2
 class Tutor(GPT):
     def __init__(self):
         super().__init__()
+        set_prompt_file(Path(__file__).resolve().parent / "prompts.toml")
         self.system = settings.system_message
         self.hard_concepts = []
         self.message_memory = 4
