@@ -1,4 +1,4 @@
-gpteasy
+justai
 #gtts
 #playsound
 python-dateutil

@@ -3,8 +3,9 @@ import json
 import sys
 from pathlib import Path
 
-from gpteasy import GPT, Repl, CommandHandler, get_prompt, set_prompt_file
-import gpteasy.display as gpt_display
+import justai
+from justai import Agent, Repl, CommandHandler, get_prompt, set_prompt_file, add_prompt_file
+from justai.tools.display import color_print, print_message, SYSTEM_COLOR
 
 try:
     import tutor.settings as settings
@@ -19,9 +20,9 @@ OUTPUT_TEXT = 1
 OUTPUT_HTML = 2
 
 
-class Tutor(GPT):
+class Tutor(Agent):
     def __init__(self):
-        super().__init__()
+        super().__init__('gpt-4-turbo-preview')
         set_prompt_file(Path(__file__).resolve().parent / "prompts.toml")
         self.system = settings.system_message
         self.hard_concepts = []
@@ -87,32 +88,36 @@ class Tutor(GPT):
     def after_response(self):
         message = self.messages[-1]
         text = json.loads(message.text)['response']
-        gpt_display.print_message(text, 'assistant')
+        print_message(text, 'assistant')
 
 
 def handle_level(level: str):
     level = level.upper()
     accepted_levels = settings.WORDS_PER_LEVEL.keys()
     if level not in accepted_levels:
-        gpt_display.color_print(f"Error: level must be one of {', '.join(accepted_levels)}",
-                                color=gpt_display.SYSTEM_COLOR)
+        color_print(f"Error: level must be one of {', '.join(accepted_levels)}",
+                                color=SYSTEM_COLOR)
     else:
         settings.get_settings()['level'] = level
-        gpt_display.color_print(f'Level set to {level}', color=gpt_display.SYSTEM_COLOR)
+        color_print(f'Level set to {level}', color=SYSTEM_COLOR)
     return True
 
 
 if __name__ == "__main__":
     s = settings.get_settings()
-    gpt_display.color_print(f"Hello, I am your {s['target_language']} tutor on {s['level']} level. " +
+    color_print(f"Hello, I am your {s['target_language']} tutor on {s['level']} level. " +
                             f"I will help you learn {s['target_language']}.\n" +
                             f"I will give you sentences in English " +
                             f"and you will have to translate them into {s['target_language']}.\n" +
-                            f"Here's your first sentence:\n", color=gpt_display.SYSTEM_COLOR)
+                            f"Here's your first sentence:\n", color=SYSTEM_COLOR)
     gpt = Tutor()
     gpt.model = s['model']
     gpt.debug = int(s['debug'])
     gpt.language = s['target_language']
+    keys = justai.tools.prompts._prompts.keys()
+    extra_prompts = Path(__file__).resolve().parent / "prompts.toml"
+    add_prompt_file(extra_prompts)
+    keys = justai.tools.prompts._prompts.keys()
 
     # Load session if passed as a command line argument
     if len(sys.argv) > 1:

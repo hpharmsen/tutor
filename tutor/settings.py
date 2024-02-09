@@ -4,7 +4,7 @@ import json
 import random
 from pathlib import Path
 
-from gpteasy import get_prompt, set_prompt_file
+from justai import get_prompt
 
 WORDS_PER_LEVEL = {'A1': 500, 'A2': 1000, 'B1': 2000, 'B2': 4000, 'C1': 8000, 'C2': 16000}
 
