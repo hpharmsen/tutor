@@ -17,7 +17,7 @@ keywords = ["ChatGPT", "GPT4", "GPT3.5", "Spanish", "Language learning", "French
 dependencies = [
     "openai",
     "tenacity",
-    "gpteasy",
+    "justai",
     #"gtts",
     #"playsound",
     #"python-dateutil",
