@@ -21,10 +21,10 @@ OUTPUT_HTML = 2
 
 
 class Tutor(Agent):
-    def __init__(self):
-        super().__init__('gpt-4-turbo-preview')
+    def __init__(self, model_name: str = 'gpt-4-turbo-preview'):
+        super().__init__(model_name)
         set_prompt_file(Path(__file__).resolve().parent / "prompts.toml")
-        self.system = settings.system_message
+        self.system = settings.system_message()
         self.hard_concepts = []
         self.message_memory = 4
         self.last_question = ''
@@ -62,8 +62,8 @@ class Tutor(Agent):
         # print('^^^^^^^^^^')
         return p
 
-    def chat(self, p, add_to_messages=True):
-        reply = super().chat(p, add_to_messages=add_to_messages)
+    def chat(self, p):
+        reply = super().chat(p)
         if type(reply) == str:
             if reply.count('{') and reply.count('}'):
                 reply = json.loads('{' + reply.split('{',1)[1].rsplit('}',1)[0] + '}')
@@ -87,7 +87,7 @@ class Tutor(Agent):
 
     def after_response(self):
         message = self.messages[-1]
-        text = json.loads(message.text)['response']
+        text = json.loads(message.content)['response']
         print_message(text, 'assistant')
 
 
@@ -110,10 +110,9 @@ if __name__ == "__main__":
                             f"I will give you sentences in English " +
                             f"and you will have to translate them into {s['target_language']}.\n" +
                             f"Here's your first sentence:\n", color=SYSTEM_COLOR)
-    gpt = Tutor()
-    gpt.model = s['model']
-    gpt.debug = int(s['debug'])
-    gpt.language = s['target_language']
+    agent = Tutor(s['model'])
+    agent.debug = int(s['debug'])
+    agent.language = s['target_language']
     keys = justai.tools.prompts._prompts.keys()
     extra_prompts = Path(__file__).resolve().parent / "prompts.toml"
     add_prompt_file(extra_prompts)
@@ -121,14 +120,14 @@ if __name__ == "__main__":
 
     # Load session if passed as a command line argument
     if len(sys.argv) > 1:
-        gpt.load(sys.argv[1])
+        agent.load(sys.argv[1])
 
     # Add a command handler that handles special commands like model parameters and system settings
-    command_handler = CommandHandler(gpt)
+    command_handler = CommandHandler(agent)
     command_handler.add_command('level', handle_level, ":level - Set the language level (A1..C2)")
 
     # Start the interactive prompt
-    repl = Repl(gpt, command_handler.handle_command)
-    repl.get_prompt = gpt.get_prompt  # partial(gpt.get_prompt, repl=repl)
+    repl = Repl(agent, command_handler.handle_command)
+    repl.get_prompt = agent.get_prompt  # partial(gpt.get_prompt, repl=repl)
     # repl.show_token_count = True  # Display how many tokens were used in each call
     repl.run()
